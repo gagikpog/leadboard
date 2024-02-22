@@ -1,5 +1,5 @@
 -- CREATE TABLE
-CREATE TABLE `leadboard`.`board` (
+CREATE TABLE `k992302t_board`.`board` (
     `id` INT NOT NULL AUTO_INCREMENT ,
     `identifier` VARCHAR(50) NOT NULL ,
     `score` INT NOT NULL ,

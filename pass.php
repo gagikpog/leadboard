@@ -4,7 +4,7 @@
             'serverName' => 'localhost',
             'username' => 'root',
             'password' => '',
-            'dbname' => 'leadboard'
+            'dbname' => 'k992302t_board'
         ];
     }
 ?>

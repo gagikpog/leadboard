@@ -3,7 +3,7 @@
 
 ## add new record
 ``` javascript
-fetch('/add.php', {
+fetch('https://gagikpog.ru/leadboard/add.php', {
     method: 'POST',
     body: JSON.stringify({
         // identifier of user
@@ -21,7 +21,7 @@ fetch('/add.php', {
 
 ## get top users
 ``` javascript
-fetch('/getTop.php', {
+fetch('https://gagikpog.ru/leadboard/getTop.php', {
     method: 'POST',
     body: JSON.stringify({
         // game name
