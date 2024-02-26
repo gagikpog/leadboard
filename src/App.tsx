@@ -20,12 +20,12 @@ export default function App() {
             method: 'POST',
             body: JSON.stringify({
                 game: gameType,
-                limit: 10
+                limit: 100
             })
         }).then((res) => {
             return res.json();
         }).then((res: IResponse<IItem[]>) => {
-            setData(res.data)
+            setData(res.data);
         });
         
     }, [gameType]);
