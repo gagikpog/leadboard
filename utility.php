@@ -1,7 +1,7 @@
 <?php
     require_once('./pass.php');
 
-    function addData($identifier, $score, $game, $meta) {
+    function addData($identifier, $score, $game, $meta, $mode = 'default') {
         $authData = getMySQLAuthData();
         $serverName = $authData['serverName'];
         $username = $authData['username'];
@@ -13,9 +13,9 @@
             // set the PDO error mode to exception
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            $sql = "INSERT INTO `board` (`identifier`, `score`, `game`, `meta`) VALUES (:identifier, :score, :game, :meta)";
+            $sql = "INSERT INTO `board` (`identifier`, `score`, `game`, `mode`, `meta`) VALUES (:identifier, :score, :game, :mode, :meta)";
             $stmt = $conn->prepare($sql);
-            $data = array(':identifier' => $identifier, ':score' => $score, ':game' => $game, ':meta' => $meta);
+            $data = array(':identifier' => $identifier, ':score' => $score, ':game' => $game, ':mode' => $mode, ':meta' => $meta);
             return $stmt->execute($data);
         } catch(PDOException $e) {
             // var_dump($e);
@@ -24,7 +24,7 @@
         return false;
     }
 
-    function getLeaderBoardTyLevel($game, $order, $limit) {
+    function getLeaderBoardTyLevel($game, $order, $limit, $mode = 'default') {
 
         $authData = getMySQLAuthData();
         $serverName = $authData['serverName'];
@@ -37,13 +37,32 @@
             // set the PDO error mode to exception
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            $sql = "SELECT `identifier`, MAX(score) as score, `created`, `meta` FROM `board` WHERE `game` = '$game' GROUP BY `identifier` ORDER BY `score` DESC LIMIT $limit";
-            
-            if ($order == 'ASC') {
-                $sql = "SELECT `identifier`, MIN(score) as score, `created`, `meta` FROM `board` WHERE `game` = '$game' GROUP BY `identifier` ORDER BY `score` ASC LIMIT $limit";
-            }
+            $order = $order === 'ASC' ? 'ASC' : 'DESC';
+            $comparison = $order === 'ASC' ? '<' : '>';
+            $limit = max(1, (int) $limit);
+
+            $sql = "SELECT `identifier`, `score`, `created`, `meta`
+                FROM `board`
+                WHERE `game` = :game AND `mode` = :mode
+                  AND NOT EXISTS (
+                    SELECT 1 FROM `board` better
+                    WHERE better.`game` = `board`.`game`
+                      AND better.`mode` = `board`.`mode`
+                      AND better.`identifier` = `board`.`identifier`
+                      AND (
+                        better.`score` $comparison `board`.`score`
+                        OR (better.`score` = `board`.`score` AND better.`created` < `board`.`created`)
+                        OR (better.`score` = `board`.`score` AND better.`created` = `board`.`created`
+                            AND better.`id` < `board`.`id`)
+                      )
+                  )
+                ORDER BY `score` $order, `created` ASC, `id` ASC
+                LIMIT :limit";
 
             $stmt = $conn->prepare($sql);
+            $stmt->bindValue(':game', $game, PDO::PARAM_STR);
+            $stmt->bindValue(':mode', $mode, PDO::PARAM_STR);
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
             $stmt->execute();
             $data = $stmt->fetchAll();
 

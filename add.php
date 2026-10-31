@@ -15,6 +15,16 @@
     $score = $data['score'];
     $game = $data['game'];
     $meta = isset($data['meta']) ? $data['meta'] : '{}';
+    $mode = array_key_exists('mode', $data) ? $data['mode'] : 'default';
+
+    if (!is_string($mode) || $mode === '' || strlen($mode) > 50) {
+        http_response_code(400);
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Режим должен быть непустой строкой длиной до 50 байт.'
+        ]);
+        return;
+    }
 
     $result = [
         'status' => 'error',
@@ -24,7 +34,7 @@
     $gamesChecked = checkGame($game);
 
     if ($gamesChecked && $identifier && $score && $meta) {
-        if (addData($identifier, $score, $game, $meta)) {
+        if (addData($identifier, $score, $game, $meta, $mode)) {
             $result['status'] = 'done';
             $result['message'] = 'Результат успешно сохранен.';
         }
