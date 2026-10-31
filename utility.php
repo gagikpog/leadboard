@@ -70,6 +70,26 @@
     }
 
     function checkGame($game) {
-        $games = ['calendar'];
-        return in_array($game, $games);
+        if (!is_string($game) || $game === '') {
+            return false;
+        }
+
+        $authData = getMySQLAuthData();
+        $serverName = $authData['serverName'];
+        $username = $authData['username'];
+        $password = $authData['password'];
+        $dbname = $authData['dbname'];
+
+        try {
+            $conn = new PDO("mysql:host=$serverName;dbname=$dbname", $username, $password);
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            $stmt = $conn->prepare('SELECT 1 FROM `games` WHERE `id` = :game LIMIT 1');
+            $stmt->execute([':game' => $game]);
+
+            return $stmt->fetchColumn() !== false;
+        } catch (PDOException $e) {
+            http_response_code(500);
+            return false;
+        }
     }
