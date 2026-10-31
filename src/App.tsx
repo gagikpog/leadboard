@@ -11,7 +11,7 @@ const components = {
 
 export default function App() {
 
-    const [gameType] = useState<TGameType>('calendar');
+    const [gameType, setGameType] = useState<TGameType>('calendar');
     const [data, setData] = useState<IItem[]>([]);
 
 
@@ -36,7 +36,16 @@ export default function App() {
         <div className="App bg-default">
             <header className='p-8 flex bg-header'>
                 <div className='text-upper '>LeadBoard</div>
-                <div className='ml-8'>{ gameType }</div>
+                <select
+                    className='ml-8'
+                    aria-label='Игра'
+                    value={gameType}
+                    onChange={(event) => setGameType(event.target.value as TGameType)}
+                >
+                    {(Object.keys(components) as TGameType[]).map((game) => (
+                        <option key={game} value={game}>{game}</option>
+                    ))}
+                </select>
             </header>
             <main className='grid grid-gap-8 grid-columns-3 m-8'>
                 {
