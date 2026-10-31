@@ -4,7 +4,12 @@ import { ICalendarMeta, IItem } from "../types";
 export function Calendar({item, index}: { item: IItem, index: number }) {
 
     const meta: ICalendarMeta = useMemo(() => {
-        return JSON.parse(item.meta);
+        try {
+            const parsed = JSON.parse(item.meta);
+            return { name: typeof parsed?.name === 'string' && parsed.name ? parsed.name : item.identifier };
+        } catch {
+            return { name: item.identifier };
+        }
     }, [item])
 
     return (
@@ -12,7 +17,7 @@ export function Calendar({item, index}: { item: IItem, index: number }) {
             <div>
                 {index + 1}
             </div>
-            <a href={`https://online.sbis.ru/person/${item.identifier}`} target="__blink">
+            <a className="player-name" href={`https://online.sbis.ru/person/${encodeURIComponent(item.identifier)}`} target="_blank" rel="noopener noreferrer">
                 {meta.name}
             </a>
             <div>

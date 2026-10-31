@@ -1,4 +1,9 @@
-export type TGameType = 'calendar';
+export type TGameType = string;
+
+export interface IGame {
+    id: string;
+    name: string;
+}
 
 export interface IResponse<T> {
     data: T;

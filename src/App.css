@@ -1,0 +1,29 @@
+.App {
+  min-height: 100vh;
+}
+
+.leaderboard-controls {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.leaderboard-controls select,
+button {
+  padding: 6px;
+  font: inherit;
+}
+
+.leaderboard-controls select {
+  max-width: 100%;
+}
+
+.leaderboard-results {
+  grid-template-columns: min-content minmax(0, 1fr) max-content;
+  max-width: 900px;
+  align-items: baseline;
+}
+
+.player-name {
+  overflow-wrap: anywhere;
+}
